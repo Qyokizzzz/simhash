@@ -3,11 +3,12 @@ from numpy import zeros, array, ndarray
 
 
 class Simhash(object):
-    def __init__(self, hashify: Callable, n: int = 128) -> None:
+    def __init__(self, hashify: Callable, n: int = 128, hamming_dist_threshold: int = 4) -> None:
         if hashify is None:
             raise Exception('hashify is required argument')
         self.hashify = hashify
-        self.n = n
+        self.n_bits = n
+        self.hamming_dist_threshold = hamming_dist_threshold
 
     def generate(self, characteristic_idx_list: List[int]) -> str:
         characteristic_hash_list = list(map(
@@ -21,13 +22,13 @@ class Simhash(object):
         ))
 
     def _gen_weights(self, characteristic_hash_list: Optional[Union[map, List[str]]]) -> ndarray:
-        res = zeros(self.n, dtype=int)
+        res = zeros(self.n_bits, dtype=int)
 
         for ch in characteristic_hash_list:
             tmp = list(map(lambda x: 1 if x == '1' else -1, ch))
-            if len(tmp) < self.n:
+            if len(tmp) < self.n_bits:
                 # 首位为0时会少位，因此首位补零
-                fill = [0 for _ in range(self.n - len(tmp))]
+                fill = [0 for _ in range(self.n_bits - len(tmp))]
                 fill.extend(tmp)
                 tmp = fill
             res += array(tmp, dtype=int)
@@ -40,16 +41,15 @@ class Simhash(object):
             raise Exception('The length of input sequences must be same.')
         return bin(int(simhash1, 2) ^ int(simhash2, 2)).count('1')
 
-    @staticmethod
-    def segment(simhash: str, n: int) -> List[str]:
+    def segment(self, simhash: str) -> List[str]:
         total_length = len(simhash)
-        if total_length % n != 0:
+        if total_length % self.hamming_dist_threshold != 0:
             raise Exception('The number of bits in the simhash must be divisible by n.')
         segmented_simhash = []
-        sub_length = int(total_length / n)
+        sub_length = int(total_length / self.hamming_dist_threshold)
         start = 0
         end = sub_length
-        for _ in range(n):
+        for _ in range(self.hamming_dist_threshold):
             segmented_simhash.append(simhash[start: end])
             start += sub_length
             end += sub_length

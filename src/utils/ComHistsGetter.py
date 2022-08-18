@@ -1,4 +1,5 @@
 import os
+from math import floor
 from random import random, randint, uniform
 from typing import Optional, Union, Tuple, List, Callable
 from numpy import ndarray, fromfile, uint8
@@ -10,27 +11,21 @@ class ComHistsGetter:
         self.extractor = extractor
 
     @staticmethod
-    def _get_slice(h: int, w: int, n: int, scale: float) -> Tuple[slice, slice]:
+    def _get_slice(h: int, w: int, n: int) -> Tuple[slice, slice]:
         if h <= w:
-            window_size = randint(int(h * scale / 2), int(h * scale * 2))
+            window_size = randint(int(h * uniform(0, 1) / 2), int(h))
         else:
-            window_size = randint(int(w * scale / 2), int(w * scale * 2))
+            window_size = randint(int(w * uniform(0, 1) / 2), int(w))
+
+        rand_start = lambda x: randint(int(x / 2 - x / 2 * uniform(0, 1)), int(x / 2) + 1)
+        rand_end = lambda x: randint(int(x / 2) + 1, int(x - floor(x / 2 * uniform(0, 0.99)) + 1))
 
         starts = {
             1: (slice(0, window_size), slice(0, window_size)),
             2: (slice(0, window_size), slice(-window_size, -1)),
             3: (slice(-window_size, -1), slice(0, window_size)),
             4: (slice(-window_size, -1), slice(-window_size, -1)),
-            5: (
-                slice(
-                    randint(int(h / 2 - h / 2 * scale), int(h / 2)),
-                    randint(int(h / 2) + 1, int(h / 2 + h / 2 * scale))
-                ),
-                slice(
-                    randint(int(w / 2 - w / 2 * scale), int(w / 2)),
-                    randint(int(w / 2)+1, int(w / 2 + w / 2 * scale))
-                )
-            )
+            5: (slice(rand_start(h), rand_end(h)), slice(rand_start(w), rand_end(w)))
         }
         return starts[n]
 
@@ -43,7 +38,7 @@ class ComHistsGetter:
                     h, w, _ = img.shape
                 else:
                     h, w = img.shape
-                ordinary_hist = self.extractor(img[self._get_slice(h, w, randint(1, 4), uniform(0.01, 0.02))])
-                random_hist = self.extractor(img[self._get_slice(h, w, 5, uniform(0.01, 0.02))])
+                ordinary_hist = self.extractor(img[self._get_slice(h, w, randint(1, 4))])
+                random_hist = self.extractor(img[self._get_slice(h, w, 5)])
                 common.append(ordinary_hist + random_hist)
         return common

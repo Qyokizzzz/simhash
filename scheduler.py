@@ -5,6 +5,7 @@ from src.callbacks import hashify_by_murmurhash_128bits, hsv_extractor
 from src.interfaces import CharacteristicIdxListExtractor
 from src.utils import Dictionary
 from src import Simhash
+from src.asserts import equal_length_assert
 
 
 class Scheduler(object):
@@ -20,9 +21,9 @@ class Scheduler(object):
         self.extractor = extractor
         self.sh = Simhash(hashify)
         self.dic = None
-        self.hists = []
-        self.com_hists = []
-        self.simhash_map: AhoCorasickDoubleArrayTrie = None
+        # self.tree_map = JClass('java.util.TreeMap')()
+        # self.simhash_map: AhoCorasickDoubleArrayTrie = None
+        self.simhash_map = dict()
 
     def handle_img(self, img: ndarray, common_hists: Optional[Union[List[ndarray], List[List[int]]]]) -> str:
         if self.extractor is None:
@@ -40,35 +41,56 @@ class Scheduler(object):
         characteristic_idx = self.ce.get_characteristic_idx_list(doc_bow, common_doc_bows)
         return self.sh.generate(characteristic_idx)
 
-    def generate_for_img_list(self, img_list: List[ndarray]) -> List[str]:
+    def generate_for_img_list(
+        self,
+        img_list: List[ndarray],
+        common_hists: Optional[Union[List[ndarray], List[List[int]]]]
+    ) -> List[str]:
         res: List[str] = []
+        hists = []
         for img in img_list:
-            hists = self.extractor(img)
-            self.hists.append(hists)
-            self.com_hists.append(hists)
+            hists.append(self.extractor(img))
 
-        for i in range(len(self.hists)):
-            front = self.com_hists[: i]
-            second = self.com_hists[i+1:]
-            characteristic_idx = self.ce.get_characteristic_idx_list(self.hists[i], front + second)
+        for i in range(len(hists)):
+            characteristic_idx = self.ce.get_characteristic_idx_list(hists[i], common_hists)
             simhash = self.sh.generate(characteristic_idx)
             res.append(simhash)
         return res
 
-    def init_simhash_map_from_list(
-        self,
-        simhash_list: List[str],
-        signature: List[str],
-        hamming_dist_threshold: int
-    ) -> None:
-        if len(simhash_list) != len(signature):
-            raise Exception('The lengths of simhash_list and signature must be equal.')
-        tree_map = JClass('java.util.TreeMap')()
+    def img_deduper(self, simhash_list: List[str], signatures: List[str]) -> None:
+        equal_length_assert(simhash_list, signatures)
+        simhash_cache = dict()
         for i in range(len(simhash_list)):
-            for sub in self.sh.segment(simhash_list[i], hamming_dist_threshold):
-                tmp = [signature[i], simhash_list[i]]
-                if tree_map[sub] is None:
-                    tree_map[sub] = [tmp]
+            for sub in self.sh.segment(simhash_list[i]):
+                tmp = (signatures[i], simhash_list[i])
+                if not simhash_cache.get(sub, False):
+                    simhash_cache[sub] = tmp
                 else:
-                    tree_map[sub].append(tmp)
-        self.simhash_map = AhoCorasickDoubleArrayTrie(tree_map)
+                    print(simhash_cache[sub])
+                    print(simhash_list[i])
+                    print(self.sh.calc_hamming_dist(simhash_cache[sub][1], simhash_list[i]))
+                    break
+
+    def save_simhash(self, simhash: str, signature: str) -> None:
+        for sub in self.sh.segment(simhash):
+            tmp = (signature, simhash)
+            if not self.simhash_map.get(sub, False):
+                self.simhash_map[sub] = [tmp]
+            else:
+                self.simhash_map[sub].extend(tmp)
+
+    def save_simhash_list(self, simhash_list: List[str], signatures: List[str]) -> None:
+        for i in range(len(simhash_list)):
+            self.save_simhash(simhash_list[i], signatures[i])
+        # self.update_simhash_map()
+
+    # def update_simhash_map(self) -> None:
+    #     self.simhash_map = AhoCorasickDoubleArrayTrie(self.tree_map)
+
+    def img_search(self, simhash: str) -> List[any]:
+        candidates = []
+        for sub in self.sh.segment(simhash):
+            ref = self.simhash_map.get(sub, False)
+            if not ref:
+                candidates.extend(ref)
+        return candidates
