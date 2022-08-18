@@ -1,6 +1,6 @@
 from typing import Optional, Union, List, Callable
-from pyhanlp import AhoCorasickDoubleArrayTrie, JClass
 from numpy import ndarray
+# from pyhanlp import AhoCorasickDoubleArrayTrie, JClass
 from src.callbacks import hashify_by_murmurhash_128bits, hsv_extractor
 from src.interfaces import CharacteristicIdxListExtractor
 from src.utils import Dictionary
@@ -91,6 +91,6 @@ class Scheduler(object):
         candidates = []
         for sub in self.sh.segment(simhash):
             ref = self.simhash_map.get(sub, False)
-            if not ref:
-                candidates.extend(ref)
+            if ref:
+                candidates += ref
         return candidates
