@@ -1,3 +1,3 @@
-from src.interfaces.CharacteristicIdxListExtractor import *
-from src.interfaces.Hashify import *
-from src.interfaces.HistExtractor import *
+from src.interfaces.CharacteristicIdxListExtractor import CharacteristicIdxListExtractor
+from src.interfaces.Hashify import Hashify
+from src.interfaces.HistExtractor import HistExtractor

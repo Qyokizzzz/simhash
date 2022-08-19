@@ -3,7 +3,7 @@ from numpy import ndarray
 from src.callbacks import hashify_by_murmurhash_128bits, hsv_extractor
 from src.interfaces import CharacteristicIdxListExtractor
 from src.utils import Dictionary
-from src import Simhash
+from src.core import Simhash
 from src.asserts import equal_length_assert
 
 

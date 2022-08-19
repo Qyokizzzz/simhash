@@ -1,7 +1,4 @@
-from scheduler import Scheduler
-from src.core import TFIDF
-from src.callbacks import hsv_extractor
-from src.utils import ComHistsGetter, read_img_from_dir
+from src import Scheduler, TFIDF, hsv_extractor, ComHistsGetter, read_img_from_dir
 from src.utils import timer
 
 

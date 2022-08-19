@@ -1,7 +1,7 @@
 import operator
 from functools import reduce
 from typing import List
-from src.utils.Common import flat
+from src.utils import flat
 
 
 class Dictionary(object):
