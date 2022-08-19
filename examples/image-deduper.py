@@ -7,7 +7,7 @@ from src.utils import timer
 
 @timer
 def main():
-    img_list, filepath_list = read_img_from_dir(r'..\img')
+    filepath_list, img_list = read_img_from_dir(r'..\img')
 
     chg = ComHistsGetter(hsv_extractor)
     common_hists = chg.get_common_hist('../common', 0.5)
@@ -15,7 +15,7 @@ def main():
     ce = TFIDF(15)
     scheduler = Scheduler(ce)
     simhash_list = scheduler.generate_for_img_list(img_list, common_hists)
-    scheduler.img_deduper(simhash_list, filepath_list)
+    print(scheduler.img_deduper(filepath_list, simhash_list))
 
 
 if __name__ == '__main__':

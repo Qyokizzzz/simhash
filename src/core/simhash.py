@@ -1,5 +1,6 @@
 from typing import Optional, Union, List, Callable
 from numpy import zeros, array, ndarray
+from src.asserts import equal_length_assert
 
 
 class Simhash(object):
@@ -37,8 +38,7 @@ class Simhash(object):
 
     @staticmethod
     def calc_hamming_dist(simhash1: str, simhash2: str) -> int:
-        if len(simhash1) != len(simhash2):
-            raise Exception('The length of input sequences must be same.')
+        equal_length_assert(simhash1, simhash2)
         return bin(int(simhash1, 2) ^ int(simhash2, 2)).count('1')
 
     def segment(self, simhash: str) -> List[str]:
