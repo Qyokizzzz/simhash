@@ -1,6 +1,7 @@
 .idea
 __pycache__
-common
+common_img
+common_doc
 corpus
 img
 stop_words

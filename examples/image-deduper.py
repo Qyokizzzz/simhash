@@ -7,7 +7,7 @@ def main():
     filepath_list, img_list = read_img_from_dir(r'..\img')
 
     chg = ComHistsGetter(hsv_extractor)
-    common_hists = chg.get_common_hist('../common', 0.5)
+    common_hists = chg.get_common_hist('../common_img', 0.5)
 
     ce = TFIDF(15)
     scheduler = Scheduler(ce)
