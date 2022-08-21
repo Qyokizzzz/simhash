@@ -1,13 +1,17 @@
-from collections.abc import Iterable
 from typing import List
 import time
+from src.asserts import is_iterable_not_str_predicate
 
 
 def flat_inner(item):
     res = []
-    if isinstance(item, Iterable) and not isinstance(item, str):
+    if is_iterable_not_str_predicate(item):
         for sub in item:
-            res.extend(flat_inner(sub))
+            flatted_item = flat_inner(sub)
+            if is_iterable_not_str_predicate(flatted_item):
+                res.extend(flatted_item)
+            else:
+                res.append(flatted_item)
         return res
     else:
         return item

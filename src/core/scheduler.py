@@ -47,6 +47,8 @@ class Scheduler(object):
         img_list: List[ndarray],
         common_hists: Optional[Union[List[ndarray], List[List[int]]]]
     ) -> List[str]:
+        if self.extractor is None:
+            raise Exception('handle image must passed extractor')
         res: List[str] = []
         hists = []
         for img in img_list:

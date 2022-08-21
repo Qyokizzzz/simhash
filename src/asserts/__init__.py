@@ -1,4 +1,9 @@
-from typing import Sequence
+from typing import Sequence, Any
+from collections.abc import Iterable
+
+
+def is_iterable_not_str_predicate(item: Any) -> bool:
+    return isinstance(item, Iterable) and not isinstance(item, str)
 
 
 def equal_length_assert(seq1: Sequence, seq2: Sequence):

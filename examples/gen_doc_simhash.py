@@ -1,7 +1,18 @@
-from src import CorpusReader
+import sys
+import io
+from src import CorpusReader, TFIDF, Scheduler
+from src.utils import timer
 
-if __name__ == '__main__':
+
+@timer
+def main():
     cr = CorpusReader()
     cr.set_stopwords_trie_from_dir(r'..\stop_words')
-    docs = cr.read_corpus_from_dir(r'..\corpus')
+    doc = cr.read_corpus_from_path(r'..\corpus\Caddy.txt')
     common_docs = cr.read_corpus_from_dir(r'..\common_doc')
+    scheduler = Scheduler(TFIDF(20))
+    print(scheduler.handle_doc(doc, common_docs))
+
+
+if __name__ == '__main__':
+    main()
