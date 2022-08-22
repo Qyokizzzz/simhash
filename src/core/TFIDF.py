@@ -9,23 +9,23 @@ class WordInfo(object):
     def __init__(self, word_idx: int):
         self.word_idx = word_idx
         self.fq = 0
-        self.docs_n = 0
+        self.docs_n = 0  # How many documents contain this word.
         self.tf = 0.00
         self.idf = 0.00
         self.tf_idf = 0.00
-  
+
     def update_fq(self, n: int) -> None:
         self.fq += n
-    
+
     def update_docs_n(self) -> None:
         self.docs_n += 1
-    
+
     def compute_tf(self, total: int) -> None:
         self.tf = self.fq / total
-    
-    def compute_idf(self, hists_total: int) -> None:
-        self.idf = log(hists_total / (self.docs_n + 1), 2)
-    
+
+    def compute_idf(self, docs_total: int) -> None:
+        self.idf = log(docs_total / (self.docs_n + 1), 2)
+
     def compute_tfidf(self) -> None:
         self.tf_idf = self.tf * self.idf
 

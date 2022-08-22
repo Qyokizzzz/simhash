@@ -4,11 +4,11 @@ from src.asserts import equal_length_assert
 
 
 class Simhash(object):
-    def __init__(self, hashify: Callable, n: int, hamming_dist_threshold: int) -> None:
+    def __init__(self, hashify: Callable, n_bits: int, hamming_dist_threshold: int) -> None:
         if hashify is None:
             raise Exception('hashify is required argument')
         self.hashify = hashify
-        self.n_bits = n
+        self.n_bits = n_bits
         self.hamming_dist_threshold = hamming_dist_threshold
 
     def generate(self, characteristic_idx_list: List[int]) -> str:
