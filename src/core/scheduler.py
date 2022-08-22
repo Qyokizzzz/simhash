@@ -1,4 +1,4 @@
-from typing import Optional, Union, List, Tuple, Callable
+from typing import Optional, Union, List, Tuple, Callable, Any
 from numpy import ndarray
 from src.callbacks import hashify_by_murmurhash_128bits, hsv_extractor
 from src.interfaces import CharacteristicIdxListExtractor
@@ -16,13 +16,15 @@ class Scheduler(object):
         self,
         ce: CharacteristicIdxListExtractor,
         hashify: Callable = hashify_by_murmurhash_128bits,
-        extractor: Callable = hsv_extractor
+        extractor: Callable = hsv_extractor,
+        n: int = 128,
+        hamming_dist_threshold: int = 4
     ) -> None:
         if ce is None:
             raise Exception('ce is required argument')
         self.ce = ce
         self.extractor = extractor
-        self.sh = Simhash(hashify)
+        self.sh = Simhash(hashify, n, hamming_dist_threshold)
         self.dic = None
         self.simhash_map = dict()
 
@@ -96,7 +98,7 @@ class Scheduler(object):
         for i in range(len(simhash_list)):
             self.save_simhash(signatures[i], simhash_list[i])
 
-    def img_search(self, simhash: str) -> List[any]:
+    def img_search(self, simhash: str) -> List[Any]:
         candidates = []
         for sub in self.sh.segment(simhash):
             ref = self.simhash_map.get(sub, False)

@@ -4,7 +4,7 @@ from src.asserts import equal_length_assert
 
 
 class Simhash(object):
-    def __init__(self, hashify: Callable, n: int = 128, hamming_dist_threshold: int = 4) -> None:
+    def __init__(self, hashify: Callable, n: int, hamming_dist_threshold: int) -> None:
         if hashify is None:
             raise Exception('hashify is required argument')
         self.hashify = hashify
