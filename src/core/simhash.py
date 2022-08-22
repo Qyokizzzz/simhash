@@ -28,7 +28,7 @@ class Simhash(object):
         for ch in characteristic_hash_list:
             tmp = list(map(lambda x: 1 if x == '1' else -1, ch))
             if len(tmp) < self.n_bits:
-                # 首位为0时会少位，因此首位补零
+                # If the first bit is 0, the length of hashify result will be less than n_bits.
                 fill = [0 for _ in range(self.n_bits - len(tmp))]
                 fill.extend(tmp)
                 tmp = fill

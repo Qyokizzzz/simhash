@@ -1,6 +1,7 @@
 from functools import reduce
 from typing import List
 from src.utils import flat
+from src.asserts import not_empty_assert
 
 
 class Dictionary(object):
@@ -11,6 +12,7 @@ class Dictionary(object):
 
     def doc2bow(self, doc: List[List[str]]) -> List[int]:
         # 返回一篇文档的词袋向量
+        not_empty_assert(doc)
         word_freq = dict(zip(self.word_set, map(lambda x: 0, self.word_set)))
         for word in reduce(flat, doc):
             word_freq[word] += 1

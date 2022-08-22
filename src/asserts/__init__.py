@@ -9,3 +9,8 @@ def is_iterable_not_str_predicate(item: Any) -> bool:
 def equal_length_assert(seq1: Sequence, seq2: Sequence):
     if len(seq1) != len(seq2):
         raise Exception('The lengths of %s and %s must be equal.' % (seq1, seq2))
+
+
+def not_empty_assert(doc: Any):
+    if not doc:
+        raise Exception('Cannot entering an empty document.')

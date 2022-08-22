@@ -1,5 +1,3 @@
-import sys
-import io
 from src import CorpusReader, TFIDF, Scheduler
 from src.utils import timer
 

@@ -12,12 +12,18 @@ class CorpusReader(object):
 
     def read_corpus_from_path(self, path: str, encoding: str = 'utf-8') -> List[List[str]]:
         with open(path, encoding=encoding) as f:
-            doc = list(map(
-                lambda s: list(filter(
-                    lambda w: not self.stopwords_trie.get(w) if self.stopwords_trie else w,
-                    map(lambda term: term.word, s)
-                )),
-                map(lambda s: HanLP.segment(re.sub(replaced, '', s)), f)
+            doc = list(filter(
+                lambda line: line,  # remove blank line
+                map(
+                    lambda s: list(filter(
+                        lambda w: not self.stopwords_trie.get(w),  # remove stop words
+                        map(lambda term: term.word, s)  # get the word from term Tuple[word, Part-of-Speech]
+                    )) if self.stopwords_trie else list(map(lambda term: term.word, s)),
+                    map(
+                        lambda s: HanLP.segment(re.sub(replaced, '', s)),  # segment
+                        f
+                    )
+                )
             ))
         return doc
 
